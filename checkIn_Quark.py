@@ -1,28 +1,73 @@
-import os 
-import re 
-import sys 
-import requests 
+import os
+import re
+import sys
+import json
+import requests
 
 cookie_list = os.getenv("COOKIE_QUARK").split('\n|&&')
+
 
 # 替代 notify 功能
 def send(title, message):
     print(f"{title}: {message}")
 
-# 获取环境变量 
-def get_env(): 
-    # 判断 COOKIE_QUARK是否存在于环境变量 
-    if "COOKIE_QUARK" in os.environ: 
-        # 读取系统变量以 \n 或 && 分割变量 
-        cookie_list = re.split('\n|&&', os.environ.get('COOKIE_QUARK')) 
-    else: 
-        # 标准日志输出 
-        print('❌未添加COOKIE_QUARK变量') 
-        send('夸克自动签到', '❌未添加COOKIE_QUARK变量') 
-        # 脚本退出 
-        sys.exit(0) 
 
-    return cookie_list 
+def push_message(title: str, content: str) -> None:
+    """
+    通过 push+ 推送消息。
+    """
+    print("PUSHPLUS 服务启动")
+
+    url = "https://www.pushplus.plus/send"
+    data = {
+        "token": get_push_token(),
+        "title": title,
+        "content": content,
+    }
+    body = json.dumps(data).encode(encoding="utf-8")
+    headers = {"Content-Type": "application/json"}
+    response = requests.post(url=url, data=body, headers=headers).json()
+
+    if response["code"] == 200:
+        print("PUSHPLUS 推送成功！")
+
+    else:
+        url_old = "http://pushplus.hxtrip.com/send"
+        headers["Accept"] = "application/json"
+        response = requests.post(url=url_old, data=body, headers=headers).json()
+
+        if response["code"] == 200:
+            print("PUSHPLUS(hxtrip) 推送成功！")
+
+        else:
+            print("PUSHPLUS 推送失败！")
+
+
+# 获取环境变量
+def get_env():
+    # 判断 COOKIE_QUARK是否存在于环境变量 
+    if "COOKIE_QUARK" in os.environ:
+        # 读取系统变量以 \n 或 && 分割变量 
+        cookie_list = re.split('\n|&&', os.environ.get('COOKIE_QUARK'))
+    else:
+        # 标准日志输出 
+        print('❌未添加COOKIE_QUARK变量')
+        send('夸克自动签到', '❌未添加COOKIE_QUARK变量')
+        # 脚本退出 
+        sys.exit(0)
+
+    return cookie_list
+
+
+def get_push_token():
+    if "PUSH_PLUS_TOKEN" in os.environ:
+        push_plus_token = os.environ.get("PUSH_PLUS_TOKEN")
+    else:
+        print("❌未添加PUSH_PLUS_TOKEN变量")
+        send('夸克自动签到', '❌未添加PUSH_PLUS_TOKEN变量')
+        sys.exit(0)
+    return push_plus_token
+
 
 # 其他代码...
 
@@ -30,6 +75,7 @@ class Quark:
     '''
     Quark类封装了签到、领取签到奖励的方法
     '''
+
     def __init__(self, user_data):
         '''
         初始化方法
@@ -64,7 +110,7 @@ class Quark:
             "vcode": self.param.get('vcode')
         }
         response = requests.get(url=url, params=querystring).json()
-        #print(response)
+        # print(response)
         if response.get("data"):
             return response["data"]
         else:
@@ -85,7 +131,7 @@ class Quark:
         }
         data = {"sign_cyclic": True}
         response = requests.post(url=url, json=data, params=querystring).json()
-        #print(response)
+        # print(response)
         if response.get("data"):
             return True, response["data"]["sign_daily_reward"]
         else:
@@ -176,6 +222,7 @@ def main():
 
     try:
         send('夸克自动签到', msg)
+        push_message('夸克自动签到', msg)
     except Exception as err:
         print('%s\n❌ 错误，请查看运行日志！' % err)
 
