@@ -5,6 +5,7 @@ import json
 import requests
 
 cookie_list = os.getenv("COOKIE_QUARK").split('\n|&&')
+print(cookie_list)
 
 
 # 替代 notify 功能
