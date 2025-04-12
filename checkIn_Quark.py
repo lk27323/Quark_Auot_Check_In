@@ -4,7 +4,8 @@ import sys
 import json
 import requests
 
-cookie_list = os.getenv("COOKIE_QUARK").split('\n|&&')
+# cookie_list = os.getenv("COOKIE_QUARK").split('\n|&&')
+cookie_list = os.getenv("COOKIE_QUARK").split(';')
 print(cookie_list)
 
 
