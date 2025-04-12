@@ -102,7 +102,8 @@ class Quark:
         获取用户当前的签到信息
         :return: 返回一个字典，包含用户当前的签到信息
         '''
-        url = "https://drive-m.quark.cn/1/clouddrive/capacity/growth/info"
+        url = f"https://drive-m.quark.cn/1/clouddrive/capacity/growth/info?pr=ucpro&fr=android&kps={self.param.get('kps')}&sign={self.param.get('sign')}&vcode={self.param.get('vcode')}"
+        # url = "https://drive-m.quark.cn/1/clouddrive/capacity/growth/info"
         querystring = {
             "pr": "ucpro",
             "fr": "android",
@@ -110,7 +111,8 @@ class Quark:
             "sign": self.param.get('sign'),
             "vcode": self.param.get('vcode')
         }
-        response = requests.get(url=url, params=querystring).json()
+        # response = requests.get(url=url, params=querystring).json()
+        response = requests.get(url).json()
         # print(response)
         if response.get("data"):
             return response["data"]
