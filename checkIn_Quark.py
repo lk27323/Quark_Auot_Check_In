@@ -4,9 +4,8 @@ import sys
 import json
 import requests
 
-# cookie_list = os.getenv("COOKIE_QUARK").split('\n|&&')
-cookie_list = os.getenv("COOKIE_QUARK").split(';')
-print(cookie_list)
+cookie_list = os.getenv("COOKIE_QUARK").split('\n|&&')
+# print(cookie_list)
 
 
 # 替代 notify 功能
@@ -200,6 +199,7 @@ def main():
     msg = ""
     global cookie_quark
     cookie_quark = get_env()
+    print(cookie_quark)
 
     print("✅ 检测到共", len(cookie_quark), "个夸克账号\n")
 
@@ -210,7 +210,7 @@ def main():
         for a in cookie_quark[i].replace(" ", "").split(';'):
             if not a == '':
                 user_data.update({a[0:a.index('=')]: a[a.index('=') + 1:]})
-        # print(user_data)
+        print(user_data)
         # 开始任务
         log = f"🙍🏻‍♂️ 第{i + 1}个账号"
         msg += log
